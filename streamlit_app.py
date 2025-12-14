@@ -25,6 +25,15 @@ st.set_page_config(
 # Apply custom styles
 apply_custom_styles()
 
+# Hide default Streamlit navigation
+st.markdown("""
+<style>
+    [data-testid="stSidebarNav"] {
+        display: none;
+    }
+</style>
+""", unsafe_allow_html=True)
+
 def render_sidebar(df):
     """Render sidebar with filters and info"""
     with st.sidebar:
