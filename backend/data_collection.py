@@ -2,6 +2,7 @@ import os
 import requests
 import pdfplumber
 import pandas as pd
+import numpy as np
 from datetime import datetime, timedelta
 import re
 import config
@@ -70,7 +71,7 @@ def generate_sample_data():
             # Calculate arrivals with some randomness
             arrivals = int(country_base * seasonal_factor * covid_factor * 
                           crisis_factor * recovery_factor * 
-                          (0.8 + pd.np.random.random() * 0.4))
+                          (0.8 + np.random.random() * 0.4))
             
             data.append({
                 'date': date,
