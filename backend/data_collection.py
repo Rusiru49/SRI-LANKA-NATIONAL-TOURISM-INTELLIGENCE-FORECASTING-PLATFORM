@@ -124,6 +124,18 @@ def extract_pdf_tables(pdf_path):
         print(f"Error extracting PDF {pdf_path}: {e}")
         return []
 
+def extract_all_pdfs_in_raw():
+    """Extract tables from all PDFs in the raw data directory and print summary."""
+    raw_dir = os.path.join(os.path.dirname(__file__), 'data', 'raw')
+    pdf_files = [f for f in os.listdir(raw_dir) if f.lower().endswith('.pdf')]
+    print(f"Found {len(pdf_files)} PDF files in {raw_dir}.")
+    for pdf_file in pdf_files:
+        pdf_path = os.path.join(raw_dir, pdf_file)
+        print(f"\nExtracting tables from: {pdf_file}")
+        tables = extract_pdf_tables(pdf_path)
+        print(f"  Extracted {len(tables)} tables.")
+    print("\nAll PDFs extraction attempted.")
+
 def fetch_weather_data(lat=7.8731, lon=80.7718, start_date=None, end_date=None):
     """
     Fetch weather data from Open-Meteo API for Sri Lanka
@@ -164,6 +176,9 @@ if __name__ == '__main__':
     print("=" * 60)
     print("DATA COLLECTION MODULE")
     print("=" * 60)
+    
+    # Extract all PDFs in raw directory
+    extract_all_pdfs_in_raw()
     
     # Generate/collect data
     df = scrape_sltda_pdfs()

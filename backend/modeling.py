@@ -190,38 +190,44 @@ def forecast_future(prophet_model, lstm_model, scaler, df, months_ahead=12):
     print("=" * 60)
     
     # Prophet forecast
+    ts_df = df.groupby('date')['arrivals'].sum().reset_index().sort_values('date')
+    last_date = ts_df['date'].max()
+    
+    # Ensure Prophet generates enough future periods
     future = prophet_model.make_future_dataframe(periods=months_ahead, freq='MS')
     prophet_forecast = prophet_model.predict(future)
     
-    # LSTM forecast
-    ts_df = df.groupby('date')['arrivals'].sum().reset_index().sort_values('date')
-    scaled_data = scaler.transform(ts_df[['arrivals']])
+    # Get only the future predictions
+    prophet_future = prophet_forecast[prophet_forecast['ds'] > last_date].head(months_ahead)
     
+    # LSTM forecast
+    scaled_data = scaler.transform(ts_df[['arrivals']])
     lookback = config.LSTM_PARAMS['lookback']
     last_sequence = scaled_data[-lookback:]
-    
     lstm_predictions = []
     current_sequence = last_sequence.copy()
-    
     for _ in range(months_ahead):
         pred = lstm_model.predict(current_sequence.reshape(1, lookback, 1), verbose=0)
         lstm_predictions.append(pred[0, 0])
         current_sequence = np.append(current_sequence[1:], pred)
-    
     lstm_predictions = scaler.inverse_transform(np.array(lstm_predictions).reshape(-1, 1))
     
-    # Combine forecasts (ensemble)
-    last_date = ts_df['date'].max()
+    # Generate future dates
     future_dates = pd.date_range(start=last_date + pd.DateOffset(months=1), 
                                   periods=months_ahead, freq='MS')
     
-    prophet_future = prophet_forecast[prophet_forecast['ds'] > last_date].head(months_ahead)
+    # Handle case where prophet_future is empty
+    if prophet_future.shape[0] < months_ahead:
+        print("Warning: Prophet did not generate enough future predictions. Filling with NaN.")
+        prophet_yhat = np.full(months_ahead, np.nan)
+    else:
+        prophet_yhat = prophet_future['yhat'].values
     
     ensemble_forecast = pd.DataFrame({
         'date': future_dates,
-        'prophet_forecast': prophet_future['yhat'].values,
+        'prophet_forecast': prophet_yhat,
         'lstm_forecast': lstm_predictions.flatten(),
-        'ensemble_forecast': (prophet_future['yhat'].values + lstm_predictions.flatten()) / 2
+        'ensemble_forecast': np.nanmean(np.array([prophet_yhat, lstm_predictions.flatten()]), axis=0)
     })
     
     print("\nForecast generated:")

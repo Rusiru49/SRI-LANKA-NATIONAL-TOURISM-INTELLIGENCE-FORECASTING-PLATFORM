@@ -3,35 +3,33 @@
 # ================================================================================
 
 # ============================================================================
-# Python Backend
+# Python
 # ============================================================================
 
-# Virtual Environment
-backend/venv/
-backend/env/
-backend/ENV/
-backend/.venv/
-*.pyc
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
 *$py.class
 
+# C extensions
+*.so
+
 # Distribution / packaging
-backend/.Python
-backend/build/
-backend/develop-eggs/
-backend/dist/
-backend/downloads/
-backend/eggs/
-backend/.eggs/
-backend/lib/
-backend/lib64/
-backend/parts/
-backend/sdist/
-backend/var/
-backend/wheels/
-backend/pip-wheel-metadata/
-backend/share/python-wheels/
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+pip-wheel-metadata/
+share/python-wheels/
 *.egg-info/
 .installed.cfg
 *.egg
@@ -41,170 +39,223 @@ MANIFEST
 *.manifest
 *.spec
 
-# Unit test / coverage
-backend/htmlcov/
-backend/.tox/
-backend/.nox/
-backend/.coverage
-backend/.coverage.*
-backend/.cache
-backend/nosetests.xml
-backend/coverage.xml
-backend/*.cover
-backend/*.py,cover
-backend/.hypothesis/
-backend/.pytest_cache/
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+
+# Translations
+*.mo
+*.pot
+
+# Django stuff:
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+
+# Flask stuff:
+instance/
+.webassets-cache
+
+# Scrapy stuff:
+.scrapy
+
+# Sphinx documentation
+docs/_build/
+
+# PyBuilder
+target/
 
 # Jupyter Notebook
-backend/.ipynb_checkpoints
+.ipynb_checkpoints
+*.ipynb
 
 # IPython
-backend/profile_default/
-backend/ipython_config.py
+profile_default/
+ipython_config.py
 
 # pyenv
-backend/.python-version
+.python-version
+
+# pipenv
+Pipfile.lock
+
+# PEP 582
+__pypackages__/
+
+# Celery stuff
+celerybeat-schedule
+celerybeat.pid
+
+# SageMath parsed files
+*.sage.py
 
 # Environments
-backend/.env
-backend/.venv
-backend/env.bak/
-backend/venv.bak/
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
 # Spyder project settings
-backend/.spyderproject
-backend/.spyproject
+.spyderproject
+.spyproject
 
 # Rope project settings
-backend/.ropeproject
+.ropeproject
 
 # mkdocs documentation
-backend/site
+/site
 
 # mypy
-backend/.mypy_cache/
-backend/.dmypy.json
-backend/dmypy.json
+.mypy_cache/
+.dmypy.json
+dmypy.json
 
 # Pyre type checker
-backend/.pyre/
+.pyre/
 
 # ============================================================================
-# Data Files (Keep raw data, ignore processed/models for large files)
+# Streamlit
 # ============================================================================
 
-# Raw PDFs (can be large)
-backend/data/raw/*.pdf
-
-# Processed data (regeneratable)
-backend/data/processed/*.csv
-backend/data/processed/*.json
-backend/data/processed/*.pkl
-
-# Machine Learning Models (can be large)
-backend/data/models/*.pkl
-backend/data/models/*.h5
-backend/data/models/*.joblib
-backend/data/models/*.model
-backend/data/models/*.pt
-backend/data/models/*.pth
-
-# Temporary data files
-backend/data/temp/
-backend/data/cache/
-*.tmp
-
-# ============================================================================
-# Streamlit Frontend
-# ============================================================================
-
-# Streamlit cache
+# Streamlit cache and secrets
 .streamlit/
 __streamlit__/
-*.streamlit/
-
-# Streamlit secrets
-.streamlit/secrets.toml
 secrets.toml
 
 # ============================================================================
-# Node.js Frontend (if using React version)
+# Data Files & Machine Learning
+# ============================================================================
+
+# Raw data (large PDFs)
+data/raw/*.pdf
+
+# Processed data (regeneratable)
+data/processed/*.csv
+data/processed/*.json
+data/processed/*.pkl
+data/processed/*.parquet
+data/processed/*.feather
+
+# Machine Learning Models (can be large)
+data/models/*.pkl
+data/models/*.h5
+data/models/*.joblib
+data/models/*.model
+data/models/*.pt
+data/models/*.pth
+data/models/*.keras
+data/models/*.pb
+
+# TensorFlow/Keras specific
+*.ckpt
+*.ckpt.*
+checkpoint
+saved_model/
+
+# Prophet model cache
+prophet_cache/
+
+# Temporary data files
+data/temp/
+data/cache/
+*.tmp
+*.temp
+
+# Compressed data
+*.csv.gz
+*.tar.gz
+*.zip
+*.rar
+*.7z
+
+# ============================================================================
+# Node.js / Frontend (if applicable)
 # ============================================================================
 
 # Dependencies
-frontend/node_modules/
-frontend/npm-debug.log*
-frontend/yarn-debug.log*
-frontend/yarn-error.log*
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
 
 # Testing
-frontend/coverage/
+coverage/
 
 # Production build
-frontend/build/
-frontend/dist/
+build/
+dist/
 
 # Misc
-frontend/.DS_Store
-frontend/.env.local
-frontend/.env.development.local
-frontend/.env.test.local
-frontend/.env.production.local
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
 # Optional npm cache directory
-frontend/.npm
+.npm
 
 # Optional eslint cache
-frontend/.eslintcache
+.eslintcache
 
 # Optional REPL history
-frontend/.node_repl_history
+.node_repl_history
 
 # Output of 'npm pack'
-frontend/*.tgz
+*.tgz
 
-# Yarn Integrity file
-frontend/.yarn-integrity
-
-# parcel-bundler cache
-frontend/.cache
-frontend/.parcel-cache
+# Yarn
+.yarn-integrity
+.yarn/cache
+.yarn/unplugged
+.yarn/build-state.yml
+.yarn/install-state.gz
+.pnp.*
 
 # Next.js
-frontend/.next
-frontend/out
+.next/
+out/
 
 # Nuxt.js
-frontend/.nuxt
+.nuxt/
 
-# Gatsby files
-frontend/.cache/
-frontend/public
-
-# vuepress build output
-frontend/.vuepress/dist
+# Gatsby
+.cache/
+public/
 
 # Serverless directories
-frontend/.serverless/
+.serverless/
 
 # FuseBox cache
-frontend/.fusebox/
+.fusebox/
 
 # DynamoDB Local files
-frontend/.dynamodb/
+.dynamodb/
 
 # TernJS port file
-frontend/.tern-port
+.tern-port
 
 # Stores VSCode versions used for testing VSCode extensions
-frontend/.vscode-test
-
-# yarn v2
-frontend/.yarn/cache
-frontend/.yarn/unplugged
-frontend/.yarn/build-state.yml
-frontend/.yarn/install-state.gz
-frontend/.pnp.*
+.vscode-test
 
 # ============================================================================
 # IDEs and Editors
@@ -249,7 +300,6 @@ tramp
 # NetBeans
 nbproject/
 nbbuild/
-dist/
 nbdist/
 .nb-gradle/
 
@@ -292,7 +342,6 @@ $RECYCLE.BIN/
 *.lnk
 
 # Linux
-*~
 .directory
 .Trash-*
 .nfs*
@@ -305,10 +354,6 @@ $RECYCLE.BIN/
 *.log
 logs/
 *.log.*
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-lerna-debug.log*
 pids/
 *.pid
 *.seed
@@ -330,31 +375,18 @@ pids/
 *.backup
 *.old
 *.orig
-*~
 
 # Temporary files
-*.tmp
-*.temp
 tmp/
 temp/
-
-# Archives
-*.zip
-*.tar
-*.tar.gz
-*.rar
-*.7z
 
 # ============================================================================
 # Project Specific
 # ============================================================================
 
 # Configuration files with sensitive data
-backend/config.local.py
-frontend/.env
-frontend/.env.local
-backend/.env
-backend/.env.local
+config.local.py
+config/local.py
 
 # API keys and secrets
 secrets.json
@@ -363,55 +395,48 @@ credentials.json
 *.key
 *.cert
 
-# Large dataset files
-*.csv.gz
-*.parquet
-*.feather
-
-# Jupyter notebooks (if not needed in repo)
-*.ipynb
-
 # Script outputs
 scripts/output/
 scripts/logs/
+output/
 
 # Documentation builds
-docs/_build/
 docs/_static/
 docs/_templates/
 
 # ============================================================================
-# Docker (if added later)
+# Docker
 # ============================================================================
 
 # Docker
-*.dockerfile
 docker-compose.override.yml
-.dockerignore
 
 # ============================================================================
-# CI/CD (if added later)
+# CI/CD
 # ============================================================================
 
 # GitHub Actions
 .github/workflows/*.log
 
-# CircleCI
-.circleci/
-
-# Travis CI
-.travis.yml
-
 # ============================================================================
 # Keep These Files
 # ============================================================================
 
-# Force include certain files even if matched by rules above
+# Force include certain files
 !.gitkeep
-!backend/data/.gitkeep
-!backend/data/raw/.gitkeep
-!backend/data/processed/.gitkeep
-!backend/data/models/.gitkeep
+!data/.gitkeep
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+!data/models/.gitkeep
+!data/samples/
 
-# Keep sample data if small
-!backend/data/samples/
+# Keep small sample data files
+!data/samples/*.csv
+!data/samples/*.json
+
+# Keep README files
+!**/README.md
+
+# Keep requirements file
+!requirements.txt
+!requirements-dev.txt
