@@ -43,9 +43,7 @@ def render_sidebar(df):
                  style="width: 100%; max-width: 200px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.2);">
         </div>
         """, unsafe_allow_html=True)
-        
-        st.markdown('<div class="section-header"><h3>⚙️ Dashboard Controls</h3></div>', unsafe_allow_html=True)
-        
+                
         # Year filter
         available_years = sorted(df['year'].unique().tolist())
         selected_year = st.selectbox(
@@ -206,7 +204,7 @@ def main():
             Powered by Advanced Machine Learning & Data Analytics
         </div>
         <div style="display: flex; justify-content: center; gap: 24px; font-size: 0.9rem; color: #bfc9d1;">
-            <span>🤖 Prophet + LSTM Ensemble</span>
+            <span>🤖 XGBoost + LSTM Ensemble</span>
             <span>•</span>
             <span>📊 Real-time Analytics</span>
             <span>•</span>
