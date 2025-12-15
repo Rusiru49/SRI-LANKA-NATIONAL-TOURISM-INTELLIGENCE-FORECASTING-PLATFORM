@@ -72,36 +72,6 @@ This project was developed as a **Data Science academic project** with a strong 
 
 ## 📁 Project Structure
 
-```bash
-SRI-LANKA-NATIONAL-TOURISM-INTELLIGENCE-FORECASTING-PLATFORM/
-│
-├── backend/
-│   ├── data_collection.py
-│   ├── preprocessing.py
-│   ├── modeling.py
-│   └── forecasting.py
-│
-├── pages/
-│   ├── overview_page.py
-│   ├── trends_page.py
-│   ├── country_insight.py
-│   └── ai_forecast.py
-│
-├── utils/
-│   ├── data_loader.py
-│   └── styles.py
-│
-├── data/
-│   ├── raw/
-│   └── processed/
-│
-├── app.py
-├── config.py
-├── requirements.txt
-└── README.md
-```
-
----
 
 ## ⚙️ Installation & Setup
 
