@@ -175,7 +175,7 @@ def render(data):
             fig_bar = px.bar(
                 yc_df,
                 x='year',
-                y='arrivals',
+                y='total_arrivals',
                 text_auto=True
             )
 

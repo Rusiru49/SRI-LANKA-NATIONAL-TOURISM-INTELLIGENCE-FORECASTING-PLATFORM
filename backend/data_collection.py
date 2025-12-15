@@ -13,7 +13,7 @@ def generate_sample_data():
     
     # Generate monthly data from 2019-2024
     start_date = datetime(2019, 1, 1)
-    end_date = datetime(2024, 11, 1)
+    end_date = datetime(2025, 11, 1)
     
     dates = pd.date_range(start=start_date, end=end_date, freq='MS')
     

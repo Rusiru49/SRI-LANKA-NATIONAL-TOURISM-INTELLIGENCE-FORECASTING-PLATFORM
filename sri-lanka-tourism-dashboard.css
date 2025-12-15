@@ -609,4 +609,107 @@ div[data-testid="stMetricDelta"] {
     margin-bottom: 8px;
 }
 
+.insight-card {
+    margin-top: 18px;
+    padding: 16px 20px;
+    border-radius: 12px;
+    font-size: 1.05rem;
+    background: rgba(255, 255, 255, 0.04);
+    border-left: 5px solid;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.insight-card.positive {
+    border-color: #43e97b;
+    color: #43e97b;
+}
+
+.insight-card.negative {
+    border-color: #ff6b6b;
+    color: #ff6b6b;
+}
+
+.trend-icon {
+    font-size: 1.4rem;
+    font-weight: bold;
+}
+
+/* ============================================
+   Section Containers
+   ============================================ */
+.section {
+    background: rgba(35, 42, 52, 0.65);
+    border: 1px solid var(--border-color);
+    border-radius: 18px;
+    padding: 24px 28px;
+    margin-bottom: 28px;
+    box-shadow: var(--shadow-md);
+    backdrop-filter: blur(12px);
+}
+
+.section-header {
+    margin-bottom: 8px;
+}
+
+.section-header p {
+    font-size: 0.95rem;
+    color: var(--text-secondary);
+}
+
+/* ============================================
+   KPI Grid
+   ============================================ */
+.kpi-grid {
+    margin-top: 12px;
+}
+
+/* ============================================
+   Insight Card (Centered)
+   ============================================ */
+.insight-wrapper {
+    display: flex;
+    justify-content: center;
+    margin: 20px 0 30px 0;
+}
+
+.insight-card {
+    max-width: 420px;
+    width: 100%;
+    justify-content: center;
+}
+
+/* ============================================
+   Chart Containers
+   ============================================ */
+.chart-card {
+    background: rgba(35, 42, 52, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 16px;
+    padding: 16px 18px 8px 18px;
+    box-shadow: var(--shadow-sm);
+}
+
+/* ============================================
+   Tab Titles
+   ============================================ */
+.tab-title {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 12px;
+    color: var(--text-primary);
+}
+
+/* ============================================
+   Empty State Text
+   ============================================ */
+.empty-state {
+    text-align: center;
+    padding: 24px;
+    color: var(--text-secondary);
+    font-size: 0.95rem;
+}
+
+
 /* Add more as needed for other inline styles */
