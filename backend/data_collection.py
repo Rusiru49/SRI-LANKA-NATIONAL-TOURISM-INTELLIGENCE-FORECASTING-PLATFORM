@@ -12,7 +12,7 @@ def generate_sample_data():
     print("Generating sample tourism data...")
     
     # Generate monthly data from 2019-2024
-    start_date = datetime(2019, 1, 1)
+    start_date = datetime(2018, 1, 1)
     end_date = datetime(2025, 11, 1)
     
     dates = pd.date_range(start=start_date, end=end_date, freq='MS')
