@@ -72,50 +72,16 @@ def add_temporal_features(df):
     df['day_of_year'] = df['date'].dt.dayofyear
     df['week_of_year'] = df['date'].dt.isocalendar().week
     
-    # Cyclical encoding for month
+    # Cyclical encoding for month (keep this - different from XGBoost's version)
     df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
     df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
     
     return df
 
-def add_lag_features(df, lags=[1, 3, 6, 12]):
-    """Add lagged features for time series"""
-    # Sort by country and date
-    df = df.sort_values(['country', 'date'])
-    
-    for lag in lags:
-        df[f'arrivals_lag_{lag}'] = df.groupby('country')['arrivals'].shift(lag)
-    
-    # Rolling statistics
-    df['arrivals_rolling_mean_3'] = df.groupby('country')['arrivals'].transform(
-        lambda x: x.rolling(window=3, min_periods=1).mean()
-    )
-    df['arrivals_rolling_std_3'] = df.groupby('country')['arrivals'].transform(
-        lambda x: x.rolling(window=3, min_periods=1).std()
-    )
-    
-    return df
-
-def add_growth_features(df):
-    """Add growth rate features"""
-    df = df.sort_values(['country', 'date'])
-    
-    # Year-over-year growth
-    df['yoy_growth'] = df.groupby('country')['arrivals'].pct_change(12)
-    
-    # Month-over-month growth
-    df['mom_growth'] = df.groupby('country')['arrivals'].pct_change(1)
-    
-    return df
-
 def handle_missing_values(df):
     """Handle missing values"""
-    # Fill NaN values in lag features with 0
-    lag_cols = [col for col in df.columns if 'lag' in col or 'rolling' in col or 'growth' in col]
-    df[lag_cols] = df[lag_cols].fillna(0)
-    
-    # Fill any other missing values
-    df = df.fillna(method='ffill').fillna(method='bfill').fillna(0)
+    # Use forward fill then backward fill for any remaining NaN values
+    df = df.ffill().bfill().fillna(0)
     
     return df
 
@@ -146,13 +112,7 @@ def preprocess_data():
     print("5. Adding temporal features...")
     df = add_temporal_features(df)
     
-    print("6. Adding lag features...")
-    df = add_lag_features(df)
-    
-    print("7. Adding growth features...")
-    df = add_growth_features(df)
-    
-    print("8. Handling missing values...")
+    print("6. Handling missing values...")
     df = handle_missing_values(df)
     
     # Save processed data
@@ -165,6 +125,7 @@ def preprocess_data():
     print(f"Final shape: {df.shape}")
     print(f"Columns: {list(df.columns)}")
     print(f"\nProcessed data saved to: {output_file}")
+    print("\nNote: Lag and rolling features will be created by the XGBoost model")
     
     return df
 

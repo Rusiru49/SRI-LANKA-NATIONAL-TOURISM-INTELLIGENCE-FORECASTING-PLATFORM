@@ -13,23 +13,36 @@ CORS(app)
 # Load models and data
 def load_models():
     models = {}
-    try:
-        models['prophet'] = joblib.load(config.PROPHET_MODEL_FILE)
-        print("Prophet model loaded")
-    except:
-        print("Prophet model not found")
     
+    # Load XGBoost model (replaces Prophet)
+    try:
+        xgb_model_file = config.PROPHET_MODEL_FILE.replace('prophet', 'xgboost')
+        models['xgboost'] = joblib.load(xgb_model_file)
+        print("XGBoost model loaded")
+    except Exception as e:
+        print(f"XGBoost model not found: {e}")
+    
+    # Load XGBoost feature columns
+    try:
+        feature_cols_file = config.PROCESSED_DATA_DIR + '/xgb_feature_cols.pkl'
+        models['xgb_features'] = joblib.load(feature_cols_file)
+        print("XGBoost features loaded")
+    except Exception as e:
+        print(f"XGBoost features not found: {e}")
+    
+    # Load LSTM model
     try:
         models['lstm'] = keras.models.load_model(config.LSTM_MODEL_FILE)
         print("LSTM model loaded")
-    except:
-        print("LSTM model not found")
+    except Exception as e:
+        print(f"LSTM model not found: {e}")
     
+    # Load scaler
     try:
         models['scaler'] = joblib.load(config.SCALER_FILE)
         print("Scaler loaded")
-    except:
-        print("Scaler not found")
+    except Exception as e:
+        print(f"Scaler not found: {e}")
     
     return models
 
@@ -46,7 +59,16 @@ def load_data():
 @app.route('/api/health', methods=['GET'])
 def health():
     """Health check endpoint"""
-    return jsonify({'status': 'healthy', 'message': 'API is running'})
+    models_status = {
+        'xgboost': 'xgboost' in models,
+        'lstm': 'lstm' in models,
+        'scaler': 'scaler' in models
+    }
+    return jsonify({
+        'status': 'healthy',
+        'message': 'API is running',
+        'models_loaded': models_status
+    })
 
 @app.route('/api/overview', methods=['GET'])
 def overview():
@@ -161,9 +183,58 @@ def get_forecast():
     try:
         forecast_df = pd.read_csv(forecast_file)
         forecast_df['date'] = pd.to_datetime(forecast_df['date']).dt.strftime('%Y-%m-%d')
-        return jsonify(forecast_df.to_dict('records'))
-    except:
-        return jsonify({'error': 'Forecast not available'}), 404
+        
+        # Return with model names updated
+        result = []
+        for _, row in forecast_df.iterrows():
+            result.append({
+                'date': row['date'],
+                'xgboost_forecast': float(row['xgboost_forecast']),
+                'lstm_forecast': float(row['lstm_forecast']),
+                'ensemble_forecast': float(row['ensemble_forecast'])
+            })
+        
+        return jsonify(result)
+    except Exception as e:
+        return jsonify({'error': f'Forecast not available: {str(e)}'}), 404
+
+@app.route('/api/model-performance', methods=['GET'])
+def model_performance():
+    """Get model performance metrics"""
+    forecast_file = os.path.join(config.PROCESSED_DATA_DIR, 'forecast.csv')
+    
+    try:
+        forecast_df = pd.read_csv(forecast_file)
+        
+        # Calculate statistics for each model
+        xgb_stats = {
+            'mean': float(forecast_df['xgboost_forecast'].mean()),
+            'std': float(forecast_df['xgboost_forecast'].std()),
+            'min': float(forecast_df['xgboost_forecast'].min()),
+            'max': float(forecast_df['xgboost_forecast'].max())
+        }
+        
+        lstm_stats = {
+            'mean': float(forecast_df['lstm_forecast'].mean()),
+            'std': float(forecast_df['lstm_forecast'].std()),
+            'min': float(forecast_df['lstm_forecast'].min()),
+            'max': float(forecast_df['lstm_forecast'].max())
+        }
+        
+        ensemble_stats = {
+            'mean': float(forecast_df['ensemble_forecast'].mean()),
+            'std': float(forecast_df['ensemble_forecast'].std()),
+            'min': float(forecast_df['ensemble_forecast'].min()),
+            'max': float(forecast_df['ensemble_forecast'].max())
+        }
+        
+        return jsonify({
+            'xgboost': xgb_stats,
+            'lstm': lstm_stats,
+            'ensemble': ensemble_stats
+        })
+    except Exception as e:
+        return jsonify({'error': f'Performance metrics not available: {str(e)}'}), 404
 
 @app.route('/api/year-comparison', methods=['GET'])
 def year_comparison():
@@ -254,6 +325,7 @@ if __name__ == '__main__':
     print("  - GET /api/seasonal-analysis")
     print("  - GET /api/top-countries")
     print("  - GET /api/forecast")
+    print("  - GET /api/model-performance (NEW)")
     print("  - GET /api/year-comparison")
     print("  - GET /api/regional-analysis")
     print("  - GET /api/growth-rates")

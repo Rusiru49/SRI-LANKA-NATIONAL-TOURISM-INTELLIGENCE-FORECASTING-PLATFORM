@@ -1,8 +1,8 @@
 import pandas as pd
 import numpy as np
-from prophet import Prophet
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error, mean_squared_error
+import xgboost as xgb
 import tensorflow as tf
 from tensorflow import keras
 from tensorflow.keras.models import Sequential
@@ -27,58 +27,131 @@ def load_processed_data():
         df['date'] = pd.to_datetime(df['date'])
         return df
 
-def prepare_prophet_data(df):
-    """Prepare data for Prophet model"""
-    # Aggregate by date
-    prophet_df = df.groupby('date')['arrivals'].sum().reset_index()
-    prophet_df.columns = ['ds', 'y']
-    return prophet_df
+def create_time_features(df):
+    """Create time-based features for XGBoost"""
+    df = df.copy()
+    df['year'] = df['date'].dt.year
+    df['month'] = df['date'].dt.month
+    df['quarter'] = df['date'].dt.quarter
+    df['year_month'] = df['year'] * 12 + df['month']
+    
+    # Cyclical encoding for seasonality
+    df['month_sin'] = np.sin(2 * np.pi * df['month'] / 12)
+    df['month_cos'] = np.cos(2 * np.pi * df['month'] / 12)
+    df['quarter_sin'] = np.sin(2 * np.pi * df['quarter'] / 4)
+    df['quarter_cos'] = np.cos(2 * np.pi * df['quarter'] / 4)
+    
+    return df
 
-def train_prophet_model(df):
-    """Train Prophet model for time series forecasting"""
+def create_lag_features(df, target_col='arrivals', lags=[1, 2, 3, 6, 12]):
+    """Create lag features"""
+    df = df.copy()
+    for lag in lags:
+        df[f'lag_{lag}'] = df[target_col].shift(lag)
+    
+    # Rolling statistics
+    df['rolling_mean_3'] = df[target_col].shift(1).rolling(window=3).mean()
+    df['rolling_mean_6'] = df[target_col].shift(1).rolling(window=6).mean()
+    df['rolling_mean_12'] = df[target_col].shift(1).rolling(window=12).mean()
+    df['rolling_std_3'] = df[target_col].shift(1).rolling(window=3).std()
+    df['rolling_std_6'] = df[target_col].shift(1).rolling(window=6).std()
+    
+    return df
+
+def prepare_xgboost_data(df):
+    """Prepare data for XGBoost model"""
+    # Aggregate by date
+    ts_df = df.groupby('date')['arrivals'].sum().reset_index()
+    ts_df = ts_df.sort_values('date').reset_index(drop=True)
+    
+    # Create features
+    ts_df = create_time_features(ts_df)
+    ts_df = create_lag_features(ts_df, target_col='arrivals')
+    
+    # Drop rows with NaN (from lag features)
+    ts_df = ts_df.dropna().reset_index(drop=True)
+    
+    return ts_df
+
+def train_xgboost_model(df):
+    """Train XGBoost model for time series forecasting"""
     print("\n" + "=" * 60)
-    print("TRAINING PROPHET MODEL")
+    print("TRAINING XGBOOST MODEL")
     print("=" * 60)
     
     # Prepare data
-    prophet_df = prepare_prophet_data(df)
+    ts_df = prepare_xgboost_data(df)
     
-    # Split data
-    train_size = int(len(prophet_df) * 0.8)
-    train_df = prophet_df[:train_size]
-    test_df = prophet_df[train_size:]
+    # Define features and target
+    feature_cols = [col for col in ts_df.columns if col not in ['date', 'arrivals']]
+    X = ts_df[feature_cols]
+    y = ts_df['arrivals']
     
-    print(f"\nTraining set: {len(train_df)} months")
-    print(f"Test set: {len(test_df)} months")
+    # Split data (80/20)
+    train_size = int(len(X) * 0.8)
+    X_train, X_test = X[:train_size], X[train_size:]
+    y_train, y_test = y[:train_size], y[train_size:]
+    
+    print(f"\nTraining samples: {len(X_train)}")
+    print(f"Test samples: {len(X_test)}")
+    print(f"Number of features: {len(feature_cols)}")
+    
+    # Define XGBoost parameters
+    xgb_params = {
+        'objective': 'reg:squarederror',
+        'max_depth': 6,
+        'learning_rate': 0.1,
+        'n_estimators': 200,
+        'subsample': 0.8,
+        'colsample_bytree': 0.8,
+        'random_state': 42,
+        'early_stopping_rounds': 20
+    }
     
     # Train model
-    print("\nTraining Prophet...")
-    model = Prophet(**config.PROPHET_PARAMS)
-    model.fit(train_df)
+    print("\nTraining XGBoost...")
+    model = xgb.XGBRegressor(**xgb_params)
+    model.fit(
+        X_train, y_train,
+        eval_set=[(X_train, y_train), (X_test, y_test)],
+        verbose=False
+    )
     
     # Make predictions
-    future = model.make_future_dataframe(periods=len(test_df), freq='MS')
-    forecast = model.predict(future)
+    train_pred = model.predict(X_train)
+    test_pred = model.predict(X_test)
     
     # Evaluate
-    train_pred = forecast.iloc[:train_size]['yhat'].values
-    test_pred = forecast.iloc[train_size:]['yhat'].values
-    
-    train_mae = mean_absolute_error(train_df['y'], train_pred)
-    test_mae = mean_absolute_error(test_df['y'], test_pred)
-    train_rmse = np.sqrt(mean_squared_error(train_df['y'], train_pred))
-    test_rmse = np.sqrt(mean_squared_error(test_df['y'], test_pred))
+    train_mae = mean_absolute_error(y_train, train_pred)
+    test_mae = mean_absolute_error(y_test, test_pred)
+    train_rmse = np.sqrt(mean_squared_error(y_train, train_pred))
+    test_rmse = np.sqrt(mean_squared_error(y_test, test_pred))
     
     print(f"\nTrain MAE: {train_mae:.2f}")
     print(f"Train RMSE: {train_rmse:.2f}")
     print(f"Test MAE: {test_mae:.2f}")
     print(f"Test RMSE: {test_rmse:.2f}")
     
-    # Save model
-    joblib.dump(model, config.PROPHET_MODEL_FILE)
-    print(f"\nModel saved to: {config.PROPHET_MODEL_FILE}")
+    # Feature importance
+    print("\nTop 10 Most Important Features:")
+    feature_importance = pd.DataFrame({
+        'feature': feature_cols,
+        'importance': model.feature_importances_
+    }).sort_values('importance', ascending=False)
+    print(feature_importance.head(10).to_string(index=False))
     
-    return model, forecast
+    # Save model
+    xgb_model_file = config.PROPHET_MODEL_FILE.replace('prophet', 'xgboost')
+    joblib.dump(model, xgb_model_file)
+    
+    # Save feature columns for future use
+    feature_cols_file = config.PROCESSED_DATA_DIR + '/xgb_feature_cols.pkl'
+    joblib.dump(feature_cols, feature_cols_file)
+    
+    print(f"\nModel saved to: {xgb_model_file}")
+    print(f"Feature columns saved to: {feature_cols_file}")
+    
+    return model, feature_cols, ts_df
 
 def prepare_lstm_data(df, lookback=12):
     """Prepare data for LSTM model"""
@@ -183,22 +256,40 @@ def train_lstm_model(df):
     
     return model, scaler, history
 
-def forecast_future(prophet_model, lstm_model, scaler, df, months_ahead=12):
+def forecast_future(xgb_model, feature_cols, lstm_model, scaler, df, months_ahead=12):
     """Generate future forecasts"""
     print("\n" + "=" * 60)
     print(f"GENERATING {months_ahead}-MONTH FORECAST")
     print("=" * 60)
     
-    # Prophet forecast
+    # Prepare historical data
     ts_df = df.groupby('date')['arrivals'].sum().reset_index().sort_values('date')
     last_date = ts_df['date'].max()
     
-    # Ensure Prophet generates enough future periods
-    future = prophet_model.make_future_dataframe(periods=months_ahead, freq='MS')
-    prophet_forecast = prophet_model.predict(future)
+    # Generate future dates
+    future_dates = pd.date_range(start=last_date + pd.DateOffset(months=1), 
+                                  periods=months_ahead, freq='MS')
     
-    # Get only the future predictions
-    prophet_future = prophet_forecast[prophet_forecast['ds'] > last_date].head(months_ahead)
+    # XGBoost forecast (recursive)
+    xgb_predictions = []
+    forecast_df = ts_df.copy()
+    
+    for future_date in future_dates:
+        # Create features for the next month
+        next_row = pd.DataFrame({'date': [future_date], 'arrivals': [np.nan]})
+        forecast_df = pd.concat([forecast_df, next_row], ignore_index=True)
+        forecast_df = create_time_features(forecast_df)
+        forecast_df = create_lag_features(forecast_df, target_col='arrivals')
+        
+        # Get the last row features
+        last_row = forecast_df.iloc[-1:][feature_cols]
+        
+        # Predict
+        pred = xgb_model.predict(last_row)[0]
+        xgb_predictions.append(pred)
+        
+        # Update the forecast_df with prediction for next iteration
+        forecast_df.loc[forecast_df.index[-1], 'arrivals'] = pred
     
     # LSTM forecast
     scaled_data = scaler.transform(ts_df[['arrivals']])
@@ -206,28 +297,20 @@ def forecast_future(prophet_model, lstm_model, scaler, df, months_ahead=12):
     last_sequence = scaled_data[-lookback:]
     lstm_predictions = []
     current_sequence = last_sequence.copy()
+    
     for _ in range(months_ahead):
         pred = lstm_model.predict(current_sequence.reshape(1, lookback, 1), verbose=0)
         lstm_predictions.append(pred[0, 0])
         current_sequence = np.append(current_sequence[1:], pred)
+    
     lstm_predictions = scaler.inverse_transform(np.array(lstm_predictions).reshape(-1, 1))
     
-    # Generate future dates
-    future_dates = pd.date_range(start=last_date + pd.DateOffset(months=1), 
-                                  periods=months_ahead, freq='MS')
-    
-    # Handle case where prophet_future is empty
-    if prophet_future.shape[0] < months_ahead:
-        print("Warning: Prophet did not generate enough future predictions. Filling with NaN.")
-        prophet_yhat = np.full(months_ahead, np.nan)
-    else:
-        prophet_yhat = prophet_future['yhat'].values
-    
+    # Create ensemble forecast
     ensemble_forecast = pd.DataFrame({
         'date': future_dates,
-        'prophet_forecast': prophet_yhat,
+        'xgboost_forecast': xgb_predictions,
         'lstm_forecast': lstm_predictions.flatten(),
-        'ensemble_forecast': np.nanmean(np.array([prophet_yhat, lstm_predictions.flatten()]), axis=0)
+        'ensemble_forecast': np.mean([xgb_predictions, lstm_predictions.flatten()], axis=0)
     })
     
     print("\nForecast generated:")
@@ -250,19 +333,19 @@ if __name__ == '__main__':
     df = load_processed_data()
     print(f"Loaded {len(df)} records")
     
-    # Train Prophet
-    prophet_model, prophet_forecast = train_prophet_model(df)
+    # Train XGBoost
+    xgb_model, feature_cols, ts_df = train_xgboost_model(df)
     
     # Train LSTM
     lstm_model, scaler, history = train_lstm_model(df)
     
     # Generate forecast
-    forecast = forecast_future(prophet_model, lstm_model, scaler, df, months_ahead=12)
+    forecast = forecast_future(xgb_model, feature_cols, lstm_model, scaler, df, months_ahead=12)
     
     print("\n" + "=" * 60)
     print("MODEL TRAINING COMPLETED SUCCESSFULLY!")
     print("=" * 60)
     print("\nModels saved:")
-    print(f"  - Prophet: {config.PROPHET_MODEL_FILE}")
+    print(f"  - XGBoost: {config.PROPHET_MODEL_FILE.replace('prophet', 'xgboost')}")
     print(f"  - LSTM: {config.LSTM_MODEL_FILE}")
     print(f"  - Scaler: {config.SCALER_FILE}")

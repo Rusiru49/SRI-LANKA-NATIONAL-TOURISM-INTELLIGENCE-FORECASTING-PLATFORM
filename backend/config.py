@@ -84,15 +84,19 @@ SEASONS = {
     'Inter Monsoon': [3, 4]                     # Mar-Apr
 }
 
-# Model parameters
-PROPHET_PARAMS = {
-    'yearly_seasonality': True,
-    'weekly_seasonality': False,
-    'daily_seasonality': False,
-    'seasonality_mode': 'multiplicative',
-    'changepoint_prior_scale': 0.05
+# Model parameters - XGBoost (replaces Prophet)
+XGBOOST_PARAMS = {
+    'objective': 'reg:squarederror',
+    'max_depth': 6,
+    'learning_rate': 0.1,
+    'n_estimators': 200,
+    'subsample': 0.8,
+    'colsample_bytree': 0.8,
+    'random_state': 42,
+    'early_stopping_rounds': 20
 }
 
+# LSTM parameters
 LSTM_PARAMS = {
     'units': 100,
     'epochs': 100,
@@ -103,6 +107,10 @@ LSTM_PARAMS = {
 
 # File names
 PROCESSED_DATA_FILE = os.path.join(PROCESSED_DATA_DIR, 'tourist_arrivals.csv')
-PROPHET_MODEL_FILE = os.path.join(MODELS_DIR, 'prophet_model.pkl')
+XGBOOST_MODEL_FILE = os.path.join(MODELS_DIR, 'xgboost_model.pkl')
+XGBOOST_FEATURES_FILE = os.path.join(MODELS_DIR, 'xgb_feature_cols.pkl')
 LSTM_MODEL_FILE = os.path.join(MODELS_DIR, 'lstm_model.h5')
 SCALER_FILE = os.path.join(MODELS_DIR, 'scaler.pkl')
+
+# Legacy file names (for backward compatibility)
+PROPHET_MODEL_FILE = os.path.join(MODELS_DIR, 'prophet_model.pkl')  # Will be replaced with XGBoost
