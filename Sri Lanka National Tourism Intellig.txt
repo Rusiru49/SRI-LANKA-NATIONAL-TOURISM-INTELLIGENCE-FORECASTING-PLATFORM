@@ -1,0 +1,99 @@
+Sri Lanka National Tourism Intelligence & Forecasting Platform – Internship-Level Scope
+Project Overview
+
+A comprehensive data-driven platform that leverages historical tourism data, external datasets, and machine learning models to analyze, forecast, and optimize tourism planning in Sri Lanka. Designed to provide actionable insights for tourism authorities, businesses, and policymakers.
+
+Key Achievements:
+
+Interactive dashboards for trend visualization and KPI monitoring
+
+AI-based forecasting of tourist arrivals
+
+Automated data processing pipeline with real-time updates
+
+Decision support and recommendation features
+
+Core Features
+1. Data Integration & Enrichment
+
+Historical tourist arrival data (years, regions, seasons)
+
+Weather and climate data for trend correlation
+
+Event and festival data to capture tourism spikes
+
+Flight, port, and transport data for origin analysis
+
+Social media sentiment analysis to detect traveler preferences
+
+Tech: Python (Pandas, NumPy), APIs, Web Scraping
+
+2. Advanced Forecasting & Analytics
+
+Models: XGBoost, ARIMA, Prophet, LSTM (ensemble forecasting)
+
+Scenario-based forecasts: Predict impacts of events, natural disasters, or policy changes
+
+Uncertainty quantification: Prediction intervals for better planning
+
+Trend decomposition: Seasonal, trend, and residual analysis
+
+Tech: Python (Scikit-learn, XGBoost, Statsmodels, Prophet, TensorFlow/Keras)
+
+3. Interactive Dashboard & Visualizations
+
+Overview dashboard with key KPIs: arrivals, revenue, occupancy rates
+
+Year-over-year, monthly, and seasonal trend comparisons
+
+Regional heatmaps and geospatial visualizations using Plotly & Folium
+
+Role-based dashboard views (Analyst, Admin, Policy Maker)
+
+Export-ready tables and PDF/Excel reports
+
+Tech: Streamlit, Plotly, Folium, Dash (optional)
+
+4. Recommendation & Decision Support System
+
+Suggest optimal destinations for specific tourist types based on season and region
+
+Cluster analysis to identify tourist segments and preferences
+
+Automated alerts for high tourist influx or underutilized regions
+
+Predictive KPIs for hotel capacity, marketing campaigns, and resource allocation
+
+Tech: Python (Scikit-learn, ML clustering), Streamlit notifications
+
+5. Data Processing & MLOps
+
+Automated ETL pipeline: data ingestion, cleaning, feature engineering, and storage
+
+Handling missing values, outliers, and anomalies
+
+Versioned data and model tracking (MLflow or DVC)
+
+Scheduled model retraining and dashboard updates (Airflow / cron jobs)
+
+Cloud deployment (AWS/GCP/Heroku) with live API endpoints for predictions
+
+Tech: Python, Pandas, NumPy, MLflow/DVC, Docker, AWS/GCP
+
+6. Advanced Analytics & Insights
+
+Correlation analysis with external factors: GDP, exchange rates, hotel occupancy
+
+Clustering and segmentation of tourists by origin, season, and preference
+
+What-if analysis for tourism strategies (e.g., marketing campaigns, new attractions)
+
+Tech: Python (Pandas, NumPy, Scikit-learn, Matplotlib, Seaborn)
+
+Technical Stack
+Layer	Tools & Libraries
+Data Processing	Python, Pandas, NumPy, SQL, APIs, Web Scraping
+Machine Learning	Scikit-learn, XGBoost, ARIMA, Prophet, TensorFlow/Keras
+Visualization	Streamlit, Plotly, Folium, Matplotlib, Seaborn
+Dashboard & Reporting	Streamlit, PDF/Excel exports, interactive charts
+MLOps & Deployment	MLflow/DVC, Airflow, Docker, AWS/GCP/Heroku, REST API
