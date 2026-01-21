@@ -339,4 +339,8 @@ Sri Lanka Institute of Information Technology.
 
 ---
 
+<<<<<<< HEAD
 **Made with ❤️ for Sri Lanka's Tourism Industry**
+=======
+**Made with ❤️ for Sri Lanka's Tourism Industry**
+>>>>>>> 531fc18508987ecaf8fa8ae8a870226ba0893ad4
