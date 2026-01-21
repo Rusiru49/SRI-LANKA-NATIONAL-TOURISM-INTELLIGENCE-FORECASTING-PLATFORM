@@ -1,186 +1,152 @@
 import streamlit as st
 
 def apply_custom_styles():
-    """Apply custom CSS styles to the dashboard"""
+    """Professional dashboard styles - no white cards, no glowing colors"""
     
-    # Load external CSS if exists
-    try:
-        with open("sri-lanka-tourism-dashboard.css") as f:
-            st.markdown(f"<style>{f.read()}</style>", unsafe_allow_html=True)
-    except:
-        pass
-    
-    # Apply enhanced custom CSS
     st.markdown("""
     <style>
-        /* Glass Card Effect */
-        .glass-card {
-            background: rgba(35, 42, 52, 0.6) !important;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(67, 233, 123, 0.1);
-            border-radius: 16px;
-            padding: 24px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
-        }
-        
-        /* Animated gradient background */
+        /* Dashboard Background */
         .main {
-            background: linear-gradient(135deg, #0f1419 0%, #1a1f2e 50%, #0f1419 100%);
-            animation: gradientShift 15s ease infinite;
-            background-size: 200% 200%;
+            background: #F4F5F7;
         }
-        
-        @keyframes gradientShift {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        /* Enhanced Header */
+
+        /* Header */
         .dashboard-header {
-            background: linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.1) 100%);
-            border-radius: 20px;
-            padding: 32px;
+            background: #D9E2EC; /* soft muted blue-gray */
+            border-radius: 12px;
+            padding: 28px;
             margin-bottom: 32px;
-            border: 1px solid rgba(67, 233, 123, 0.2);
-            box-shadow: 0 8px 32px rgba(67, 233, 123, 0.1);
+            border: 1px solid #BCCCDC;
         }
-        
+
         .dashboard-header h1 {
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 3rem !important;
-            font-weight: 800 !important;
-            margin-bottom: 8px;
-            text-shadow: none !important;
+            color: #1B3A57;
+            font-size: 2.5rem !important;
+            font-weight: 700 !important;
         }
-        
+
         .dashboard-header .subtitle {
-            color: #bfc9d1 !important;
-            font-size: 1.2rem;
+            color: #495057 !important;
+            font-size: 1.1rem;
             font-weight: 400;
         }
-        
-        /* Enhanced Metrics */
-        .stMetric {
-            background: linear-gradient(135deg, rgba(35, 42, 52, 0.8) 0%, rgba(35, 42, 52, 0.6) 100%) !important;
-            border: 1px solid rgba(67, 233, 123, 0.15) !important;
-            transition: all 0.3s ease;
+
+        /* Metric Cards */
+        .stat-card {
+            background: #E0E4E8; /* muted card color */
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid #BCCCDC;
+            text-align: center;
+            transition: all 0.2s ease;
+            color: #1B3A57;
         }
-        
-        .stMetric:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 12px 24px rgba(67, 233, 123, 0.15);
-            border-color: rgba(67, 233, 123, 0.3) !important;
+
+        .stat-card:hover {
+            border-color: #3A8D7C; /* subtle accent */
+            transform: translateY(-2px);
         }
-        
+
+        .stat-card .number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1B3A57;
+        }
+
+        .stat-card .label {
+            color: #495057;
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+
+        .stat-card .delta {
+            font-size: 0.9rem;
+            color: #3A8D7C;
+            margin-top: 4px;
+        }
+
+        /* Info Boxes */
+        .info-box {
+            background: #D9E2EC;
+            border-left: 4px solid #3A8D7C;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #1B3A57;
+        }
+
         /* Section Headers */
         .section-header {
             display: flex;
             align-items: center;
             gap: 12px;
             padding: 16px 0;
-            border-bottom: 2px solid rgba(67, 233, 123, 0.2);
+            border-bottom: 2px solid #BCCCDC;
             margin-bottom: 24px;
         }
-        
+
         .section-header h2 {
             margin: 0 !important;
             font-size: 1.8rem !important;
+            color: #1B3A57;
         }
-        
-        /* Stat Cards */
-        .stat-card {
-            background: linear-gradient(135deg, rgba(35, 42, 52, 0.9) 0%, rgba(35, 42, 52, 0.7) 100%);
-            border-radius: 16px;
-            padding: 20px;
-            border: 1px solid rgba(67, 233, 123, 0.15);
-            text-align: center;
-            transition: all 0.3s ease;
+
+        /* Country Cards */
+        .country-card {
+            background: #E0E4E8;
+            border: 1px solid #BCCCDC;
+            border-radius: 12px;
+            padding: 16px;
+            margin: 8px 0;
+            transition: all 0.2s ease;
+            color: #1B3A57;
         }
-        
-        .stat-card:hover {
-            border-color: rgba(67, 233, 123, 0.4);
-            box-shadow: 0 8px 24px rgba(67, 233, 123, 0.15);
+
+        .country-card:hover {
+            border-color: #3A8D7C;
+            transform: translateX(2px);
         }
-        
-        .stat-card .number {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .stat-card .label {
-            color: #bfc9d1;
-            font-size: 0.9rem;
-            margin-top: 8px;
-        }
-        
-        /* Enhanced Tabs */
+
+        /* Tabs */
         .stTabs [data-baseweb="tab-list"] {
             gap: 8px !important;
-            background: rgba(35, 42, 52, 0.4) !important;
+            background: #D9E2EC !important;
             padding: 8px !important;
             border-radius: 12px !important;
         }
-        
+
         .stTabs [data-baseweb="tab"] {
             height: 50px !important;
             padding: 0 24px !important;
         }
-        
+
         .stTabs [aria-selected="true"] {
-            box-shadow: 0 4px 12px rgba(67, 233, 123, 0.2);
+            border-bottom: 3px solid #3A8D7C;
         }
-        
-        /* Info boxes */
-        .info-box {
-            background: linear-gradient(135deg, rgba(67, 233, 123, 0.1) 0%, rgba(56, 249, 215, 0.05) 100%);
-            border-left: 4px solid #43e97b;
-            border-radius: 12px;
-            padding: 20px;
-            margin: 20px 0;
-        }
-        
-        /* Country cards */
-        .country-card {
-            background: rgba(35, 42, 52, 0.6);
-            border: 1px solid rgba(67, 233, 123, 0.1);
-            border-radius: 12px;
-            padding: 16px;
-            margin: 8px 0;
-            transition: all 0.3s ease;
-        }
-        
-        .country-card:hover {
-            border-color: rgba(67, 233, 123, 0.3);
-            transform: translateX(4px);
-        }
-        
-        /* Enhanced dividers */
+
+        /* Divider */
         .stDivider {
             margin: 32px 0 !important;
-            border-top: 1px solid rgba(67, 233, 123, 0.15) !important;
+            border-top: 1px solid #BCCCDC !important;
         }
-        
+
         /* Footer */
         .dashboard-footer {
-            background: linear-gradient(135deg, rgba(35, 42, 52, 0.8) 0%, rgba(35, 42, 52, 0.6) 100%);
-            border-radius: 16px;
-            border-top: 2px solid rgba(67, 233, 123, 0.2);
+            background: #D9E2EC;
+            border-radius: 12px;
+            border-top: 1px solid #BCCCDC;
             padding: 24px;
             margin-top: 48px;
             text-align: center;
+            color: #495057;
         }
     </style>
     """, unsafe_allow_html=True)
 
+
 def create_metric_card(label, value, icon="📊", delta=None):
-    """Create a custom metric card"""
-    delta_html = f"<div style='color: #43e97b; font-size: 0.9rem; margin-top: 4px;'>{delta}</div>" if delta else ""
+    """Custom metric card with professional muted color theme"""
+    delta_html = f"<div class='delta'>{delta}</div>" if delta else ""
     return f"""
     <div class="stat-card">
         <div style="font-size: 2rem; margin-bottom: 8px;">{icon}</div>

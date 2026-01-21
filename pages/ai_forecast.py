@@ -22,8 +22,7 @@ def render(data):
             <div>
                 <div style="font-size: 1.2rem; font-weight: 600; color: #43e97b; margin-bottom: 8px;">Advanced Machine Learning Forecast</div>
                 <div style="color: #bfc9d1; line-height: 1.6;">
-                    Our ensemble model combines <strong>XGBoost</strong> (Extreme Gradient Boosting with advanced feature engineering) 
-                    and <strong>LSTM</strong> (Long Short-Term Memory neural networks) to predict tourist arrivals 
+                    Our ensemble model combines <strong>XGBoost</strong> and <strong>LSTM</strong> to predict tourist arrivals 
                     for the next 12 months with high accuracy.
                 </div>
             </div>
@@ -40,7 +39,7 @@ def render(data):
             if col not in forecast_df.columns:
                 forecast_df[col] = np.nan
         
-        # Calculate Statistics (use ensemble forecast)
+        # Calculate Statistics
         total_forecast = forecast_df['ensemble_forecast'].sum()
         avg_monthly = forecast_df['ensemble_forecast'].mean()
         max_forecast = forecast_df['ensemble_forecast'].max()
@@ -85,7 +84,7 @@ def render(data):
         if monthly_trends:
             historical_df = pd.DataFrame(monthly_trends)
             historical_df['date'] = pd.to_datetime(historical_df['date']).dt.to_pydatetime()
-            recent_historical = historical_df.tail(24)  # Last 2 years
+            recent_historical = historical_df.tail(24)
             
             fig = go.Figure()
             
@@ -113,7 +112,7 @@ def render(data):
                 hovertemplate='<b>%{x|%B %Y}</b><br>Forecast: %{y:,.0f}<extra></extra>'
             ))
             
-            # XGBoost forecast (only if column exists)
+            # XGBoost forecast
             if 'xgboost_forecast' in forecast_df.columns:
                 fig.add_trace(go.Scatter(
                     x=forecast_df['date'],
@@ -125,7 +124,7 @@ def render(data):
                     hovertemplate='<b>%{x|%B %Y}</b><br>XGBoost: %{y:,.0f}<extra></extra>'
                 ))
             
-            # LSTM forecast (only if column exists)
+            # LSTM forecast
             if 'lstm_forecast' in forecast_df.columns:
                 fig.add_trace(go.Scatter(
                     x=forecast_df['date'],
@@ -265,21 +264,85 @@ def render(data):
         
         st.divider()
         
-        # Detailed Forecast Table
+        # ===========================
+        # Professional Detailed Table
+        # ===========================
         st.markdown('<div class="section-header"><h3>📋 Detailed Monthly Forecast</h3></div>', unsafe_allow_html=True)
         display_df = forecast_df.copy()
-        display_df['date'] = pd.to_datetime(display_df['date']).dt.strftime('%B %Y')
-        
+        display_df['Month'] = pd.to_datetime(display_df['date']).dt.strftime('%B %Y')
+
         # Safe formatting
         safe_int_format = lambda x: f"{int(x):,}" if pd.notnull(x) else "N/A"
         for col in ['xgboost_forecast', 'lstm_forecast', 'ensemble_forecast']:
             display_df[col] = display_df[col].apply(safe_int_format)
-        
-        display_df = display_df[['date', 'xgboost_forecast', 'lstm_forecast', 'ensemble_forecast']]
+
+        # Convert numeric values for conditional formatting
+        numeric_df = forecast_df[['xgboost_forecast', 'lstm_forecast', 'ensemble_forecast']].copy()
+
+        # Identify peaks and lows
+        peak_indices = numeric_df['ensemble_forecast'].idxmax()
+        low_indices = numeric_df['ensemble_forecast'].idxmin()
+
+        # Add emoji icons
+        display_df['Ensemble Forecast'] = display_df['ensemble_forecast'].copy()
+        display_df.loc[peak_indices, 'Ensemble Forecast'] = f"🎯 {display_df.loc[peak_indices, 'Ensemble Forecast']}"
+        display_df.loc[low_indices, 'Ensemble Forecast'] = f"📉 {display_df.loc[low_indices, 'Ensemble Forecast']}"
+
+        display_df = display_df[['Month', 'xgboost_forecast', 'lstm_forecast', 'Ensemble Forecast']]
         display_df.columns = ['Month', 'XGBoost Model', 'LSTM Model', 'Ensemble Forecast']
-        st.dataframe(display_df, use_container_width=True, height=450)
-        
+
+        # Alternating row colors
+        row_colors = []
+        for i in range(len(display_df)):
+            row_colors.append('#2C2C2C' if i % 2 == 0 else '#1E1E1E')
+
+        # Conditional formatting for peak/low
+        cell_colors = []
+        for i, row in display_df.iterrows():
+            colors = []
+            for col in display_df.columns:
+                if col == 'Ensemble Forecast':
+                    if i == peak_indices:
+                        colors.append('#43e97b')
+                    elif i == low_indices:
+                        colors.append('#fa709a')
+                    else:
+                        colors.append(row_colors[i])
+                else:
+                    colors.append(row_colors[i])
+            cell_colors.append(colors)
+
+        cell_colors = list(map(list, zip(*cell_colors)))
+
+        fig_table = go.Figure(data=[go.Table(
+            header=dict(
+                values=list(display_df.columns),
+                fill_color='#1E1E1E',
+                font=dict(color='white', size=14, family='Arial'),
+                align='center',
+                height=40
+            ),
+            cells=dict(
+                values=[display_df[col] for col in display_df.columns],
+                fill_color=cell_colors,
+                font=dict(color='#e0e6ed', size=12, family='Arial'),
+                align='center',
+                height=35
+            )
+        )])
+
+        fig_table.update_layout(
+            height=500,
+            margin=dict(t=20, b=20, l=20, r=20),
+            paper_bgcolor='rgba(0,0,0,0)',
+            plot_bgcolor='rgba(0,0,0,0)',
+        )
+
+        st.plotly_chart(fig_table, use_container_width=True)
+
+        # ===========================
         # Download Section
+        # ===========================
         st.markdown("<br>", unsafe_allow_html=True)
         col1, col2, col3 = st.columns([1, 1, 1])
         with col2:
