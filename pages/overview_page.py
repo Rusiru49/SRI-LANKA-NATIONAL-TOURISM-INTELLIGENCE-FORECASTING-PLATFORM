@@ -2,6 +2,7 @@ import streamlit as st
 import pandas as pd
 import plotly.graph_objects as go
 import plotly.express as px
+
 from utils.data_loader import format_number
 from utils.styles import create_metric_card
 
@@ -9,10 +10,10 @@ from utils.styles import create_metric_card
 def render(data):
     """Render the Overview Dashboard"""
 
-    overview = data['overview']
-    filtered_df = data['filtered_df']
-    year_comparison = data['year_comparison']
-    regional_data = data['regional_data']
+    overview = data.get("overview", {})
+    filtered_df = data.get("filtered_df", pd.DataFrame())
+    year_comparison = data.get("year_comparison", [])
+    regional_data = data.get("regional_data", [])
 
     # =======================
     # PAGE HEADER
@@ -21,7 +22,7 @@ def render(data):
         """
         <div class="section-header">
             <h2>📊 Dashboard Overview</h2>
-            <p style="opacity:0.8;">
+            <p>
                 High-level insights and arrival trends based on selected filters
             </p>
         </div>
@@ -41,9 +42,9 @@ def render(data):
     with col1:
         st.markdown(
             create_metric_card(
-                "Total Arrivals",
-                format_number(overview.get('total_arrivals', 0)),
-                "🌍"
+                label="Total Arrivals",
+                value=format_number(overview.get("total_arrivals", 0)),
+                icon="🌍"
             ),
             unsafe_allow_html=True
         )
@@ -51,9 +52,9 @@ def render(data):
     with col2:
         st.markdown(
             create_metric_card(
-                "Average Monthly Arrivals",
-                format_number(overview.get('avg_monthly_arrivals', 0)),
-                "📅"
+                label="Average Monthly Arrivals",
+                value=format_number(overview.get("avg_monthly_arrivals", 0)),
+                icon="📅"
             ),
             unsafe_allow_html=True
         )
@@ -61,9 +62,9 @@ def render(data):
     with col3:
         st.markdown(
             create_metric_card(
-                "Arrivals (Last 6 Months)",
-                format_number(overview.get('recent_6_months', 0)),
-                "⏳"
+                label="Arrivals (Last 6 Months)",
+                value=format_number(overview.get("recent_6_months", 0)),
+                icon="⏳"
             ),
             unsafe_allow_html=True
         )
@@ -71,10 +72,14 @@ def render(data):
     st.markdown("<br>", unsafe_allow_html=True)
 
     # =======================
-    # TABS FOR VISUALIZATION
+    # TABS
     # =======================
     tab1, tab2, tab3 = st.tabs(
-        ["📈 Time Series Analysis", "🌎 Regional Distribution", "📅 Yearly Comparison"]
+        [
+            "📈 Time Series Analysis",
+            "🌎 Regional Distribution",
+            "📅 Yearly Comparison",
+        ]
     )
 
     # =======================
@@ -86,7 +91,7 @@ def render(data):
         if not filtered_df.empty:
             ts_df = (
                 filtered_df
-                .groupby('date', as_index=False)['arrivals']
+                .groupby("date", as_index=False)["arrivals"]
                 .sum()
             )
 
@@ -94,36 +99,35 @@ def render(data):
 
             fig.add_trace(
                 go.Scatter(
-                    x=ts_df['date'],
-                    y=ts_df['arrivals'],
-                    mode='lines+markers',
-                    name='Total Arrivals',
+                    x=ts_df["date"],
+                    y=ts_df["arrivals"],
+                    mode="lines+markers",
+                    name="Total Arrivals",
                     line=dict(width=3),
                     marker=dict(size=7),
-                    fill='tozeroy'
+                    fill="tozeroy"
                 )
             )
 
             fig.update_layout(
+                template="professional_dark",
                 height=420,
-                template='plotly_dark',
                 xaxis_title="Date",
                 yaxis_title="Arrivals",
                 hovermode="x unified",
-                margin=dict(t=40, b=30, l=30, r=30)
+                margin=dict(t=40, b=30, l=30, r=30),
             )
 
             st.plotly_chart(
                 fig,
                 use_container_width=True,
-                key="overview_timeseries"
+                key="overview_time_series"
             )
-
         else:
             st.info("No data available for the selected filters.")
 
     # =======================
-    # TAB 2: REGION BREAKDOWN
+    # TAB 2: REGIONAL BREAKDOWN
     # =======================
     with tab2:
         st.markdown("#### Arrivals by Region")
@@ -133,22 +137,21 @@ def render(data):
 
             fig_pie = px.pie(
                 region_df,
-                names='region',
-                values='arrivals',
+                names="region",
+                values="arrivals",
                 hole=0.45,
-                color_discrete_sequence=px.colors.sequential.Tealgrn
             )
 
             fig_pie.update_traces(
-                textinfo='percent+label',
+                textinfo="percent+label",
                 pull=[0.03] * len(region_df)
             )
 
             fig_pie.update_layout(
-                template='plotly_dark',
+                template="professional_dark",
                 height=380,
+                margin=dict(t=30, b=20, l=20, r=20),
                 showlegend=True,
-                margin=dict(t=30, b=20, l=20, r=20)
             )
 
             st.plotly_chart(
@@ -159,7 +162,6 @@ def render(data):
 
             with st.expander("📋 View Regional Data Table"):
                 st.dataframe(region_df, use_container_width=True)
-
         else:
             st.warning("Regional data is not available.")
 
@@ -174,17 +176,17 @@ def render(data):
 
             fig_bar = px.bar(
                 yc_df,
-                x='year',
-                y='total_arrivals',
-                text_auto=True
+                x="year",
+                y="total_arrivals",
+                text_auto=True,
             )
 
             fig_bar.update_layout(
-                template='plotly_dark',
+                template="professional_dark",
                 height=380,
                 xaxis_title="Year",
                 yaxis_title="Total Arrivals",
-                margin=dict(t=40, b=30, l=30, r=30)
+                margin=dict(t=40, b=30, l=30, r=30),
             )
 
             st.plotly_chart(
@@ -195,6 +197,5 @@ def render(data):
 
             with st.expander("📊 View Yearly Comparison Table"):
                 st.dataframe(yc_df, use_container_width=True)
-
         else:
             st.info("Yearly comparison data is unavailable.")

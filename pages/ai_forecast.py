@@ -20,7 +20,7 @@ def render(data):
         <div style="display: flex; align-items: center; gap: 16px;">
             <div style="font-size: 3rem;">🤖</div>
             <div>
-                <div style="font-size: 1.2rem; font-weight: 600; color: #43e97b; margin-bottom: 8px;">Advanced Machine Learning Forecast</div>
+                <div style="font-size: 1.2rem; font-weight: 600; color: white; margin-bottom: 8px;">Advanced Machine Learning Forecast</div>
                 <div style="color: #bfc9d1; line-height: 1.6;">
                     Our ensemble model combines <strong>XGBoost</strong> and <strong>LSTM</strong> to predict tourist arrivals 
                     for the next 12 months with high accuracy.

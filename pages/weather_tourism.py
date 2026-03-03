@@ -15,12 +15,7 @@ from backend.api_services import (
     TourismDataAggregator
 )
 from backend.api_config import APIConfig
-
-st.set_page_config(
-    page_title="Weather & Tourism Info",
-    page_icon="🌤️",
-    layout="wide"
-)
+from utils.styles import apply_custom_styles, apply_plotly_theme
 
 def main():
     st.title("🌤️ Real-Time Weather & Tourism Information")
@@ -261,4 +256,6 @@ def display_exchange_rates():
 
 
 if __name__ == "__main__":
+    apply_custom_styles()
+    apply_plotly_theme()
     main()

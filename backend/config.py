@@ -61,6 +61,16 @@ SRI_LANKAN_HOLIDAYS = {
     '2024-12-25': 'Christmas',
 }
 
+# default set of countries used for generating synthetic data
+DEFAULT_COUNTRIES = [
+    'India', 'China', 'United Kingdom', 'Germany', 'France',
+    'United States', 'Australia', 'Russia', 'Japan', 'Maldives',
+    'Netherlands', 'Switzerland', 'Italy', 'Canada', 'UAE'
+]
+
+# base arrivals used by the sample data generator
+BASE_ARRIVALS = 15000
+
 # Country groupings for analysis
 COUNTRY_REGIONS = {
     'Asia': ['India', 'China', 'Japan', 'South Korea', 'Thailand', 'Malaysia', 
